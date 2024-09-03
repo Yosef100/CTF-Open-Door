@@ -1,4 +1,4 @@
-#encrypt text using vignere cipher with key key
+#encrypt text using vignere cipher with key key. puctuation and spaces are not affected
 def vigenere_encrypt(plaintext, key):
     # Resulting encrypted text
     encrypted_text = []

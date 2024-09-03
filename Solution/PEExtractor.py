@@ -1,9 +1,9 @@
 import os
 
-# Path to the combined file
-combined_file_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-server\secure\Open Door.png"
-extracted_image_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-server\Solution\Extracted Files\extracted_image.png"
-extracted_exe_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-server\Solution\Extracted Files\extracted_exe.exe"
+# Path to the combined file (will need to be changed if run on different machine)
+combined_file_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-Open-Door\secure\Open Door.png"
+extracted_image_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-Open-Door\Solution\Extracted Files\extracted_image.png"
+extracted_exe_path = r"C:\Users\tyber\source\repos\Yosef100\CTF-Open-Door\Solution\Extracted Files\extracted_exe.exe"
 
 # Known PE signatures
 pe_dos_signature = b'MZ'
