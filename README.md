@@ -7,7 +7,7 @@ after any game where a door was not constructed, the server sends a message hint
 objective. Finally, the background picture for the-open-door.onrender.com (also should be found from pcap file) features
 a black doorframe filled with white light above which are superimposed (mostly transparent) circles resempling othello
 pieces.
-The Computer is set to play using an easily identifiable pattern - moves closest to side x possible where x changes
+The Computer is set to play using an easily identifiable pattern - moves as close to side x as possible where x changes
 in a clockwise direction, beginning from top - to help in completing this objective.
 A simple solution given the starting board is to perform the moves 44, 38, 76
 
