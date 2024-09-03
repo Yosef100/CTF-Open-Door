@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='background.png') }}");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .message-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-container">
+        <h1>The door is open.</h1>
+        <p>Your file is downloading...</p>
+        <script>
+            // Trigger the file download
+            window.location.href = "{{ url_for('download') }}";
+
+            // Redirect to index after a short delay to expire the session
+            setTimeout(function() {
+                window.location.href = "{{ url_for('expire_session') }}";
+            }, 5000); // Adjust delay if necessary to ensure download is not interrupted
+        </script>
+    </div>
+</body>
+</html>
+
