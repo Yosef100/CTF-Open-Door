@@ -1,5 +1,6 @@
+import json
 from flask import Flask, jsonify, render_template, request, redirect, url_for, send_from_directory, abort, session, flash
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, disconnect, emit
 import os
 import waitress
 import othello.game as game
@@ -58,8 +59,9 @@ def handle_connect():
     board = game.create()
     clients_boards[request.sid] = board
     
+    emit('message', {"message": "Welcome back to Open Door Othello. You are WHITE:"})
     # Send the initial board and request a move from the client
-    emit('message', game.requestMove(board))
+    emit('message', {"message": game.requestMove(board)})
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -69,49 +71,69 @@ def handle_disconnect():
         del clients_boards[request.sid]
 
 @socketio.on('move')
-def handle_move(move):
+def handle_move(data):
+    # Ensure the data is in JSON format
+    if isinstance(data, str):
+        try:
+            # Attempt to parse JSON
+            move_data = json.loads(data)
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return an error message
+            emit('message', {"message": "Error: Invalid JSON format."})
+            return
+    else:
+        move_data = data
+    
+    # Get the move from the JSON data
+    move = move_data.get("move")
+    
     if request.sid not in clients_boards:
-        emit('message', "Error: Game not initialized.")
+        emit('message', {"message": "Error: Game not initialized."})
         return
 
     # Get the board associated with the current client
     board = clients_boards[request.sid]
 
     # Process the player's move
+    move = str(move)  # Ensure move is a string before passing it
     response = game.inputMove(move, board)
-    emit('message', response)
+    emit('message', {"message": response})
 
     # Check if there are any legal moves left for the current player
     if not game.anyLegalMove(board):
-        emit('message', f"Player {board[2]}: No more moves. Changing player.\n")
+        emit('message', {"message": f"Player {board[2]}: No more moves. Changing player.\n"})
         game.changePlayer(board)
         
-    #if game isn't over
+    # If the game isn't over
     if not game.isFinished(board):    
         if not game.isHumTurn(board):
             # Computer makes its move
             computer_move = game.compMove(board)
-            emit('message', f"Computer's move: {computer_move}")
+            emit('message', {"message": f"Computer's move: {computer_move}"})
      
-    #if game isn't over
+    # If the game isn't over
     if not game.isFinished(board):       
         # Send the updated board state after the computer's move
-        emit('message', game.requestMove(board))
+        emit('message', {"message": game.requestMove(board)})
     
     else:
-        emit('message', game.printState(board))
+        emit('message', {"message": game.printState(board)})
         # Handle the end of the game
-        if board[3]:
-            emit('message', "The door is open. The knowledge you seek is yours. Congrats comrade. Unveil the Truth, Unleash the infinite!")
-            emit('message', ENCRYPTED_MESSAGE)
+        if board[3]:  # Check if the board represents an "open door"
+            emit('message', {"message": "The door is open. The knowledge you seek is yours. Congrats comrade. Unveil the Truth, Unleash the infinite!"})
+            emit('message', {"message": ENCRYPTED_MESSAGE})
         else:
             winner = game.whoWin(board)
             if winner == game.COMPUTER:
-                emit('message', "Too bad. But are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!")
+                emit('message', {"message": "Too bad. But are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!"})
             elif winner == game.HUMAN:
-                emit('message', "Nice one! But the door has not opened to you... Are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!")
+                emit('message', {"message": "Nice one! But the door has not opened to you... Are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!"})
             else:
-                emit('message', "It's a tie. Are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!")
+                emit('message', {"message": "It's a tie. Are you sure you're on the path to what you seek? Do it right this time comrade. Unveil the Truth, Unleash the infinite!"})
+
+        # Disconnect the client
+        emit('message', {"message": "Disconnecting..."})
+        disconnect()       
 
 def start_server():
     # Start Flask app with Waitress
